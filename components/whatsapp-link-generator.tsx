@@ -1,7 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { CheckIcon, CopyIcon, LoaderCircleIcon } from "lucide-react";
+import {
+  CheckIcon,
+  CopyIcon,
+  DownloadIcon,
+  LoaderCircleIcon,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -67,6 +72,80 @@ export default function WhatsAppLinkGenerator() {
     }
   };
 
+  const downloadQRAsPNG = () => {
+    const svgElement = document.getElementById("qr-code-svg");
+    if (!svgElement) return;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Set canvas dimensions (with some padding)
+    canvas.width = 240;
+    canvas.height = 240;
+
+    // Fill with white background
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Convert SVG to data URL
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgBlob = new Blob([svgData], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    const svgUrl = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      // Draw image centered on canvas
+      ctx.drawImage(img, 20, 20, 200, 200);
+
+      // Convert canvas to data URL and trigger download
+      const pngUrl = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      downloadLink.href = pngUrl;
+      downloadLink.download = "whatsapp-qr-code.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(svgUrl);
+
+      // toast({
+      //   title: "QR Code Downloaded",
+      //   description: "Your QR code has been downloaded as PNG.",
+      // })
+    };
+
+    img.src = svgUrl;
+  };
+
+  const downloadQRAsSVG = () => {
+    const svgElement = document.getElementById("qr-code-svg");
+    if (!svgElement) return;
+
+    // Get SVG content
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgBlob = new Blob([svgData], {
+      type: "image/svg+xml;charset=utf-8",
+    });
+    const svgUrl = URL.createObjectURL(svgBlob);
+
+    // Create download link
+    const downloadLink = document.createElement("a");
+    downloadLink.href = svgUrl;
+    downloadLink.download = "whatsapp-qr-code.svg";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(svgUrl);
+
+    // toast({
+    //   title: "QR Code Downloaded",
+    //   description: "Your QR code has been downloaded as SVG.",
+    // });
+  };
+
   return (
     <div className="mx-auto max-w-2xl">
       <Card className="border-green-100 bg-white shadow-md">
@@ -116,7 +195,7 @@ export default function WhatsAppLinkGenerator() {
           >
             {isGenerating ? (
               <>
-                <LoaderCircleIcon className="mr-2 h-4 w-4 animate-spin" />
+                <LoaderCircleIcon className="animate-spin" />
                 Generating...
               </>
             ) : (
@@ -154,11 +233,7 @@ export default function WhatsAppLinkGenerator() {
                       onClick={copyToClipboard}
                       className="flex-shrink-0 border-green-200 hover:bg-green-50 hover:text-green-600"
                     >
-                      {copied ? (
-                        <CheckIcon className="h-4 w-4" />
-                      ) : (
-                        <CopyIcon className="h-4 w-4" />
-                      )}
+                      {copied ? <CheckIcon /> : <CopyIcon />}
                       <span className="sr-only">Copy to clipboard</span>
                     </Button>
                   </div>
@@ -187,11 +262,32 @@ export default function WhatsAppLinkGenerator() {
                     fgColor={"#25D366"}
                     level={"L"}
                     includeMargin={false}
+                    id="qr-code-svg"
                   />
                 </div>
                 <p className="text-center text-sm text-gray-500">
                   Scan this QR code to open the WhatsApp chat
                 </p>
+
+                <div className="mt-2 flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={downloadQRAsPNG}
+                    className="border-green-200 hover:bg-green-50 hover:text-green-600"
+                  >
+                    <DownloadIcon />
+                    Download PNG
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={downloadQRAsSVG}
+                    className="border-green-200 hover:bg-green-50 hover:text-green-600"
+                  >
+                    <DownloadIcon />
+                    Download SVG
+                  </Button>
+                </div>
               </TabsContent>
             </Tabs>
           </CardFooter>
