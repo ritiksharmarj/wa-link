@@ -58,6 +58,7 @@ export default function WhatsAppLinkGenerator() {
 
       setTimeout(() => setCopied(false), 1000);
     } catch (err) {
+      console.error(err);
       // toast({
       //   title: "Failed to copy",
       //   description: "Please try again or copy manually.",
@@ -167,6 +168,7 @@ export default function WhatsAppLinkGenerator() {
                   <Button
                     variant="outline"
                     className="flex-1 border-green-200 hover:bg-green-50 hover:text-green-600"
+                    onClick={() => window.open(generatedLink, "_blank")}
                   >
                     Open in WhatsApp
                   </Button>
