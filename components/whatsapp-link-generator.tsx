@@ -246,7 +246,7 @@ export default function WhatsAppLinkGenerator() {
                   Scan this QR code to open the WhatsApp chat
                 </p>
 
-                <div className="mt-2 flex gap-2">
+                <div className="mt-2 flex w-full flex-col justify-center gap-2 md:flex-row">
                   <Button
                     variant="outline"
                     onClick={() => downloadQRAsPNG()}
