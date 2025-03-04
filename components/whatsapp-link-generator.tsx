@@ -29,7 +29,7 @@ export default function WhatsAppLinkGenerator() {
   const [copied, setCopied] = React.useState(false);
   const [isGenerating, setIsGenerating] = React.useState(false);
 
-  const generateLink = () => {
+  const generateLink = React.useCallback(() => {
     setIsGenerating(true);
 
     // Simulate a brief loading state
@@ -43,36 +43,21 @@ export default function WhatsAppLinkGenerator() {
 
       setGeneratedLink(link);
       setIsGenerating(false);
-
-      // toast({
-      //   title: "Link generated successfully!",
-      //   description: "Your WhatsApp link is ready to share.",
-      // })
     }, 300);
-  };
+  }, [phoneNumber, message]);
 
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(generatedLink);
       setCopied(true);
 
-      // toast({
-      //   title: "Copied to clipboard!",
-      //   description: "Link has been copied to your clipboard.",
-      // });
-
-      setTimeout(() => setCopied(false), 1000);
+      setTimeout(() => setCopied(false), 1500);
     } catch (err) {
-      console.error(err);
-      // toast({
-      //   title: "Failed to copy",
-      //   description: "Please try again or copy manually.",
-      //   variant: "destructive",
-      // });
+      console.error("Failed to copy:", err);
     }
   };
 
-  const downloadQRAsPNG = () => {
+  const downloadQRAsPNG = (size = 512) => {
     const svgElement = document.getElementById("qr-code-svg");
     if (!svgElement) return;
 
@@ -81,8 +66,8 @@ export default function WhatsAppLinkGenerator() {
     if (!ctx) return;
 
     // Set canvas dimensions (with some padding)
-    canvas.width = 240;
-    canvas.height = 240;
+    canvas.width = size;
+    canvas.height = size;
 
     // Fill with white background
     ctx.fillStyle = "white";
@@ -99,7 +84,9 @@ export default function WhatsAppLinkGenerator() {
     img.crossOrigin = "anonymous";
     img.onload = () => {
       // Draw image centered on canvas
-      ctx.drawImage(img, 20, 20, 200, 200);
+      const padding = Math.floor(size * 0.08);
+      const imageSize = size - padding * 2;
+      ctx.drawImage(img, padding, padding, imageSize, imageSize);
 
       // Convert canvas to data URL and trigger download
       const pngUrl = canvas.toDataURL("image/png");
@@ -110,11 +97,6 @@ export default function WhatsAppLinkGenerator() {
       downloadLink.click();
       document.body.removeChild(downloadLink);
       URL.revokeObjectURL(svgUrl);
-
-      // toast({
-      //   title: "QR Code Downloaded",
-      //   description: "Your QR code has been downloaded as PNG.",
-      // })
     };
 
     img.src = svgUrl;
@@ -139,11 +121,6 @@ export default function WhatsAppLinkGenerator() {
     downloadLink.click();
     document.body.removeChild(downloadLink);
     URL.revokeObjectURL(svgUrl);
-
-    // toast({
-    //   title: "QR Code Downloaded",
-    //   description: "Your QR code has been downloaded as SVG.",
-    // });
   };
 
   return (
@@ -166,12 +143,12 @@ export default function WhatsAppLinkGenerator() {
             <Input
               id="phone"
               type="tel"
-              placeholder="e.g. +1 (555) 123-4567"
+              placeholder="e.g. +91 895 123 4567"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
             />
             <p className="text-xs text-gray-500">
-              Include country code (e.g., +1 for US)
+              Include country code (e.g. +1 for US)
             </p>
           </div>
 
@@ -272,7 +249,7 @@ export default function WhatsAppLinkGenerator() {
                 <div className="mt-2 flex gap-2">
                   <Button
                     variant="outline"
-                    onClick={downloadQRAsPNG}
+                    onClick={() => downloadQRAsPNG()}
                     className="border-green-200 hover:bg-green-50 hover:text-green-600"
                   >
                     <DownloadIcon />
