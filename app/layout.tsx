@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
-import "./globals.css";
+import { geistSans } from "@/assets/fonts";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "WhatsApp Link Generator",
