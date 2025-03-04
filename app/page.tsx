@@ -1,3 +1,5 @@
+import WhatsAppLinkGenerator from "@/components/whatsapp-link-generator";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-green-50 to-white">
@@ -8,6 +10,8 @@ export default function Home() {
         <p className="mb-12 text-center text-lg text-gray-600">
           Create shareable WhatsApp links with pre-filled messages
         </p>
+
+        <WhatsAppLinkGenerator />
       </div>
     </main>
   );
